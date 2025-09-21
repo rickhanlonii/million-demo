@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Accordion,
   AccordionItem,
@@ -24,10 +24,10 @@ import {
   UnorderedList,
   ListItem,
   Code,
-} from '@chakra-ui/react';
-import { startTransition, useState } from 'react';
-import GithubCorner from 'react-github-corner';
-import TimesTable from './times-table';
+} from "@chakra-ui/react";
+import { startTransition, useState } from "react";
+import GithubCorner from "react-github-corner";
+import TimesTable from "./times-table";
 
 function App() {
   const [nodes, setNodes] = useState(1000);
@@ -43,9 +43,17 @@ function App() {
     <>
       <Container p={6}>
         <Stack direction="column" spacing={3}>
-          <Heading>Million vs. React Demo</Heading>
+          <Heading>Million vs. React Compiler Demo</Heading>
           <Text>
-            The following is a random times table generator benchmark (
+            The following is a fork (
+            <Link
+              href="https://github.com/rickhanlonii/million-demo"
+              isExternal
+              color="purple"
+            >
+              source <ExternalLinkIcon mx="2px" />
+            </Link>
+            ) of the random times table generator benchmark (
             <Link
               href="https://github.com/aidenybai/million-demo"
               isExternal
@@ -53,8 +61,8 @@ function App() {
             >
               source <ExternalLinkIcon mx="2px" />
             </Link>
-            ). It follows a comparison between React and Million, along with its
-            fiber equivalents.
+            ). It follows a comparison between React with the React Compiler and
+            Million.
           </Text>
           <Accordion>
             <AccordionItem>
@@ -87,31 +95,40 @@ function App() {
               <AccordionPanel pb={4}>
                 <Text>
                   <UnorderedList>
+                    <ListItem>All implementations are within React.</ListItem>
                     <ListItem>
-                      All implementations are within React. The only difference
-                      with Million implementation is a{' '}
+                      The only Million implementation uses a{" "}
                       <Link
                         href="https://github.com/aidenybai/million-demo/blob/53ee4f6c7d86e3f240a637dcf107782045c0c19d/src/times-table.jsx#L49"
                         isExternal
                         color="purple"
                       >
-                        <Code>{'block()'}</Code> wrapper
-                      </Link>{' '}
-                      and the{' '}
+                        <Code>{"block()"}</Code> wrapper
+                      </Link>{" "}
+                      and the{" "}
                       <Link
                         href="https://github.com/aidenybai/million-demo/blob/53ee4f6c7d86e3f240a637dcf107782045c0c19d/src/times-table.jsx#L104"
                         isExternal
                         color="purple"
                       >
-                        <Code>{'<For />'}</Code> component
+                        <Code>{"<For />"}</Code> component
                       </Link>
                       .
                     </ListItem>
                     <ListItem>
-                      Every row contains 100 static, hidden{' '}
-                      <Code>{'<td />'}</Code> nodes and 50{' '}
-                      <Code>{'<div />'}</Code> to stimulate diffing in order to
-                      measure performance.{' '}
+                      The React Compiler implementation uses only the React
+                      compiler, and no transitions.
+                    </ListItem>
+                    <ListItem>
+                      The 🔥 React implementation uses the React compiler, and
+                      updates the count in a transition as modern React apps
+                      would do.
+                    </ListItem>
+                    <ListItem>
+                      Every row contains 100 static, hidden{" "}
+                      <Code>{"<td />"}</Code> nodes and 50{" "}
+                      <Code>{"<div />"}</Code> to stimulate diffing in order to
+                      measure performance.{" "}
                       <u>
                         This is not representative of real React apps, it's just
                         to show where Million.js performs better than React,
@@ -151,19 +168,19 @@ function App() {
         </NumberInput>
         <Tabs isLazy={true} variant="soft-rounded" colorScheme="purple" mt={3}>
           <TabList>
-            <Tab w="full">React</Tab>
-            <Tab w="full">React Fiber</Tab>
-            <Tab w="full">⚡ Million</Tab>
+            <Tab w="full">Million</Tab>
+            <Tab w="full">React Compiler</Tab>
+            <Tab w="full">🔥 React</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
-              <TimesTable nodes={nodes} mode="react" />
-            </TabPanel>
-            <TabPanel>
-              <TimesTable nodes={nodes} mode="react-fiber" />
-            </TabPanel>
-            <TabPanel>
               <TimesTable nodes={nodes} mode="million" />
+            </TabPanel>
+            <TabPanel>
+              <TimesTable nodes={nodes} mode="react-compiler" />
+            </TabPanel>
+            <TabPanel>
+              <TimesTable nodes={nodes} mode="react-compiler-transitions" />
             </TabPanel>
           </TabPanels>
         </Tabs>

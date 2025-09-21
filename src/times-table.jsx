@@ -5,23 +5,54 @@ import {
   SkeletonText,
   Stack,
   Text,
-} from '@chakra-ui/react';
-import { startTransition, Suspense, useState, lazy } from 'react';
-const LagRadar = lazy(() => import('react-lag-radar'));
-const TableView = lazy(() => import('./table-view'));
+} from "@chakra-ui/react";
+import { Suspense, useState, lazy, startTransition } from "react";
+const LagRadar = lazy(() => import("react-lag-radar"));
+const TableView = lazy(() => import("./table-view"));
+const TableViewMillion = lazy(() => import("./table-view-million"));
 
 const descriptions = {
-  react: 'High blocking time, but low delay in updating UI',
-  'react-fiber': 'Low blocking time, but high delay in updating UI',
-  million: 'Low blocking time, and low delay in updating UI',
+  million:
+    "Low blocking time, and low delay in updating UI. Unresponsive while updating.",
+  "react-compiler":
+    "Low blocking time, and low delay in updating UI. Unresponsive while updating.",
+  "react-compiler-transitions":
+    "Low blocking time, and low delay in updating UI. Responsive while updating.",
+};
+
+// Difference from MillionJS demo - moved button to its own component.
+// This is how controlled input should setstate outside the transition.
+// It ensures fast feedback, while the results transition in the UI.
+const CountButton = ({ onClick }) => {
+  const [inputCount, setInputCount] = useState(0);
+
+  return (
+    <Button
+      colorScheme="purple"
+      variant="solid"
+      onClick={() => {
+        setInputCount(inputCount + 1);
+        onClick(inputCount + 1);
+      }}
+    >
+      <Text fontSize="md">Increment ({inputCount})</Text>
+    </Button>
+  );
 };
 
 const TimesTable = ({ nodes, mode }) => {
   const [count, setCount] = useState(0);
-
+  // Difference from MillionJS demo.
+  // Needs to set unique numbers, so the `key` works.
   const array = Array(nodes);
+  let usedNumbers = new Set();
   for (let i = 0; i < nodes; i++) {
-    array[i] = Math.floor(Math.random() * 100);
+    let uniqueNumber = Math.floor(Math.random() * 10000);
+    while (usedNumbers.has(uniqueNumber)) {
+      uniqueNumber += 100;
+    }
+    usedNumbers.add(uniqueNumber);
+    array[i] = uniqueNumber;
   }
 
   return (
@@ -35,26 +66,26 @@ const TimesTable = ({ nodes, mode }) => {
         </Text>
       </Flex>
 
-      <Button
-        colorScheme="purple"
-        variant="solid"
-        onClick={() => {
-          if (mode.includes('fiber')) {
+      <CountButton
+        onClick={(c) => {
+          if (mode.includes("react-compiler-transitions")) {
             startTransition(() => {
-              setCount(count + 1);
+              setCount(c);
             });
           } else {
-            setCount(count + 1);
+            setCount(c);
           }
         }}
-      >
-        <Text fontSize="md">Increment ({count})</Text>
-      </Button>
+      />
 
       <Suspense
         fallback={<SkeletonText noOfLines={9} spacing="3" skeletonHeight="4" />}
       >
-        <TableView array={array} count={count} mode={mode} />
+        {mode.includes("react-compiler") ? (
+          <TableView array={array} count={count} />
+        ) : (
+          <TableViewMillion array={array} count={count} />
+        )}
       </Suspense>
     </Stack>
   );
